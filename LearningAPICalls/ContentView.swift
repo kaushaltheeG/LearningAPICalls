@@ -32,9 +32,9 @@ struct ContentView: View {
                     .navigationTitle("Users")
                 }
             }
-            .onAppear(perform: usersVM.nonCombineUsersFetch)
+            .onAppear(perform: usersVM.combineUsersFetch)
             .alert(isPresented: $usersVM.hasError, error: usersVM.error) { // whevere there is an issue, it will appear on ZStack
-                Button(action: usersVM.nonCombineUsersFetch) {
+                Button(action: usersVM.combineUsersFetch) {
                     Text("Retry")
                 }
             }
