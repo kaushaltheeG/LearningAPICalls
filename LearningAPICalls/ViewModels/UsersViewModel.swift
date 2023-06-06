@@ -124,11 +124,4 @@ extension UsersViewModel {
             }
         }
     }
-    
-    func toggleFetch(toggle: Bool) -> () -> Void {
-        if (toggle) {
-            return combineUsersFetch
-        }
-        return nonCombineUsersFetch
-    }
 }
