@@ -14,10 +14,12 @@ import SwiftUI
 struct ContentView: View {
     
     @StateObject private var usersVM = UsersViewModel()
-    
+
     var body: some View {
+       
         NavigationView {
-            ZStack {
+            VStack {
+                
                 if usersVM.isRefreshing {
                     // when loading data
                     ProgressView()
@@ -29,16 +31,23 @@ struct ContentView: View {
                         }
                     }
                     .listStyle(.plain)
-                    .navigationTitle("Users")
+                    .navigationTitle(usersVM.whichFetch)
                 }
             }
-            .onAppear(perform: usersVM.combineUsersFetch)
+            .onAppear(perform: usersVM.nonCombineUsersFetch)
             .alert(isPresented: $usersVM.hasError, error: usersVM.error) { // whevere there is an issue, it will appear on ZStack
                 Button(action: usersVM.combineUsersFetch) {
                     Text("Retry")
                 }
             }
-            
+            .navigationBarItems(
+                leading: Button(action: usersVM.combineUsersFetch){
+                    Text("Combine")
+                },trailing:
+                    Button(action: usersVM.nonCombineUsersFetch){
+                        Text("Non-Combine")
+                    }
+            )
         }
     }
 }
