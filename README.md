@@ -2,7 +2,7 @@
 
 ### App Overview
 A simple **MVVM** native iOS app that displays info about fake users. The data is fetched from an free test data api endpoint.
-Users are able to click on two buttons which either fetch the data in a reactive way(**Combine**) or the non-reactive way.
+Users are able to click on two buttons which either fetches the data using **Combine** or the non-Combine way.
 
 ## Objective
 - Learning how to make network calls within a Swift iOS app
