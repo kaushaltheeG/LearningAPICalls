@@ -67,11 +67,16 @@ final class UsersViewModel: ObservableObject {
                 .shared
                 .dataTaskPublisher(for: url)
                 .receive(on: DispatchQueue.main) // receive the response on the main thread
-                .map(\.data) // access the the data property from the request
-                .tryMap({ data in // tryMap allows for error handling
+                .tryMap({ res in // tryMap allows for error handling
+                    
+                    guard let response = res.response as? HTTPURLResponse,
+                          response.statusCode >= 200 && response.statusCode <= 300 else {
+                        throw UserError.invalidStatusCode
+                    }
+                    
                     let decoder = JSONDecoder()
                     // gaurd allows for if/else statement; will gaurd the operation if valid else will throw errow
-                    guard let users = try? decoder.decode([User].self, from: data) else {
+                    guard let users = try? decoder.decode([User].self, from: res.data) else {
                         throw UserError.failedToDecode
                     }
                     return users
@@ -101,6 +106,7 @@ extension UsersViewModel {
     enum UserError: LocalizedError {
         case custom(error: Error)
         case failedToDecode
+        case invalidStatusCode
         
         var errorDescription: String? {
             switch self{
@@ -108,6 +114,8 @@ extension UsersViewModel {
                 return "Failed to Decode"
             case .custom(let error):
                 return error.localizedDescription
+            case .invalidStatusCode:
+                return "Request failed | Status Code Outside of Accepted Range "
             }
         }
     }
