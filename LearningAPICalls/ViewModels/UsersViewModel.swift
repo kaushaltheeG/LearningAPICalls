@@ -67,8 +67,15 @@ final class UsersViewModel: ObservableObject {
                 .shared
                 .dataTaskPublisher(for: url)
                 .receive(on: DispatchQueue.main) // receive the response on the main thread
-                .map(\.data) // access the the data property of the request
-                .decode(type: [User].self, decoder: JSONDecoder()) // decode data into User model
+                .map(\.data) // access the the data property from the request
+                .tryMap({ data in // tryMap allows for error handling
+                    let decoder = JSONDecoder()
+                    // gaurd allows for if/else statement; will gaurd the operation if valid else will throw errow
+                    guard let users = try? decoder.decode([User].self, from: data) else {
+                        throw UserError.failedToDecode
+                    }
+                    return users
+                })
                 .sink { res in
                     // sets isRefreshing to false when completed
                     defer { self.isRefreshing = false }
