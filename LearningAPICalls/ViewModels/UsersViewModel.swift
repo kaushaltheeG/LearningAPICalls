@@ -60,7 +60,8 @@ final class UsersViewModel: ObservableObject {
         
         
         if let url = URL(string: usersUrlString) {
-            
+            isRefreshing = true
+            hasError = false
             // returns a Publisher in which we can listen and observe the changes duing an API request
             URLSession
                 .shared
@@ -69,6 +70,16 @@ final class UsersViewModel: ObservableObject {
                 .map(\.data) // access the the data property of the request
                 .decode(type: [User].self, decoder: JSONDecoder()) // decode data into User model
                 .sink { res in
+                    // sets isRefreshing to false when completed
+                    defer { self.isRefreshing = false }
+                    // error handling case
+                    switch res {
+                    case .failure(let error):
+                        self.hasError = true
+                        self.error = UserError.custom(error: error)
+                    default:
+                        break
+                    }
                     
                 } receiveValue: { [weak self] users in
                     self?.users = users
